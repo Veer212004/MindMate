@@ -1,4 +1,5 @@
 
+[
 {
   "title": "The Impact of Academic Pressure and Stress on Mental Health",
   "categories": [
@@ -36,7 +37,8 @@
         "heading": "Conclusion",
         "text": "Academic wellness is crucial for youth. Excessive academic pressure and stress have serious implications for students’ mental health. By fostering collaboration, supportive environments, and wellness-focused strategies, academic spaces can encourage growth, resilience, and mental health."
       }
-    ],
+      ]
+    ,
     "references": [
       {
         "author": "Abrams, Z.",
@@ -87,7 +89,7 @@
       }
     ]
   }
-},{
+},
   {
   "title": "How to Help a College Student with Depression",
   "date": "May 26, 2025",
@@ -196,9 +198,8 @@
     ]
   }
 }
-
-},{
-  {
+,
+{
   "title": "Why Are College Students So Depressed?",
   "author": "Kendra Cherry, MSEd",
   "reviewer": "David Susman, PhD",
@@ -245,9 +246,7 @@
     "National Suicide Prevention Lifeline: 988"
   ]
 }
-
-},{
-  {
+,{
   "title": "A step-by-step guide to managing your sleep in the first semester of college (and improving it after that!)",
   "author": "Jenny Haward",
   "published_date": "August 21, 2025",
@@ -346,8 +345,7 @@
     "specialization": "Health, wellness and lifestyle, with particular interest in sleep"
   }
 }
-
-},{
+,
   {
   "title": "RISE Blog | Anxiety: From Surviving to Thriving",
   "author": "Faith Dolan, Peer Educator",
@@ -491,8 +489,8 @@
   "conclusion": "Dealing with anxiety can be challenging, but multiple strategies are available to manage it, including reframing thoughts, mindfulness, coping mechanisms, lifestyle changes, and professional help. Support is always within reach."
 }
 
-},{
-  {
+,{
+  
   "title": "Enhancing Social Wellbeing in College: Building Connections and Community",
   "author": "Jessica Liu",
   "date_published": "January 12, 2025",
@@ -525,8 +523,8 @@
   "impact_on_students": "Strong social wellbeing positively impacts mental health, academic performance, and overall quality of life. Students with supportive social networks report lower levels of stress, increased resilience, and higher self-esteem. Engaging socially can also enhance cognitive development, problem-solving skills, and emotional intelligence, which are crucial for both academic and future professional success.\n\nStudents who actively cultivate social connections are more likely to feel a sense of belonging and purpose on campus. This sense of community encourages participation in extracurricular activities, improves engagement in the classroom, and fosters long-term friendships that extend beyond college. Socially connected students often demonstrate better conflict resolution skills, empathy, and teamwork abilities, which are invaluable in both personal and professional contexts.\n\nConversely, social isolation or poor social wellbeing can exacerbate mental health challenges. Students who struggle to connect may experience loneliness, anxiety, depression, or lower motivation, negatively affecting both academic performance and personal growth. Chronic social isolation can even contribute to physical health problems, including sleep disturbances, weakened immunity, and increased stress-related illnesses.\n\nBy prioritizing social wellbeing and investing in meaningful relationships, students not only improve their college experience but also develop lifelong skills in communication, collaboration, and emotional resilience. The ability to foster supportive social networks equips students to navigate future challenges in careers, relationships, and personal life, creating a foundation for long-term happiness and success."
 }
 
-},{
-  {
+,{
+  
   "title": "Strategies to Prioritize Student Mental Health",
   "author": "pathway2success",
   "date": "2021-09-06",
@@ -601,8 +599,8 @@
   ]
 }
 
-},{
-  {
+,{
+  
   "title": "How to Study Effectively for Exams in a Short Time",
   "date": "April 4, 2025",
   "introduction": "For many students, exams often come with a ticking clock, mounting pressure, and the overwhelming feeling of 'so much to do, so little time.' As parents, it’s natural to wonder if your child is studying enough. But what if the problem isn’t how much they study, but how they study? By learning how to study effectively for exams in a short time, students can achieve more without burning out. Let’s explore smart strategies backed by psychology to help students unlock their potential and succeed, even with limited time.",
@@ -702,8 +700,8 @@
   "cta": "While this blog offers helpful tips, the Peak Performance Program is a sure-shot way to help your child achieve their academic best. Designed for students from 9th to 12th standard, this program tailors strategies to individual needs, helping them improve focus, manage stress, and excel academically. It all starts with an assessment to customize the program’s duration, followed by daily guidance from experienced therapists, milestone tracking, and regular updates for parents. Success is not about studying harder—it’s about studying smarter. And with these techniques, even limited time can yield extraordinary results. Want to know more about the Peak Performance Program? Reach out to us!"
 }
 
-},{
-  {
+,{
+  
   "title": "How to Overcome Social Anxiety and Build Social Confidence",
   "author": "Ms. Ayushi Garg",
   "average_read_time": "30 Mins",
@@ -821,8 +819,7 @@
   ]
 }
 
-},{
-  {
+,{
   "title": "12 Tips to Manage Stress for College Students",
   "author": "Seli Fakorzi",
   "date_published": "July 24, 2025",
@@ -890,8 +887,9 @@
   "impact_on_students": "Unmanaged stress has far-reaching consequences that ripple through nearly every area of a student’s life. Academically, it impairs focus, memory, and decision-making. A student who is constantly exhausted or anxious may struggle to keep up with coursework, leading to declining grades. For some, the cycle of poor performance and increased stress becomes a downward spiral that can result in academic probation or withdrawal from school. Stress also impacts social relationships. Students under strain may withdraw from friends, lash out in frustration, or feel too drained to participate in social activities. This isolation can worsen mental health, creating a vicious cycle of loneliness and anxiety. Additionally, many students turn to unhealthy coping mechanisms—such as overeating, binge drinking, or substance use—to escape feelings of stress. While these might provide temporary relief, they often compound problems in the long run. On the other hand, when students actively work on managing stress, the benefits extend beyond immediate relief. They gain resilience—the ability to bounce back from setbacks and face challenges with a stronger mindset. These coping skills not only improve college performance but also serve as lifelong tools for navigating the pressures of careers, relationships, and adulthood. In this way, stress management is not merely about surviving college; it is about laying the foundation for long-term success and well-being."
 }
 
-},{
-  {
+,
+{
+  
   "definition": {
     "general": "Mental health is about how people think, feel, and behave. It affects day-to-day life, relationships, and physical health. Looking after one’s mental health helps maintain the ability to enjoy life and build psychological resilience.",
     "WHO": "Mental health is a state of mental well-being that enables people to cope with life’s stresses, realize their abilities, learn well, work well, and contribute to their community. It is more than the absence of mental disorders."
@@ -1016,5 +1014,5 @@
   ],
   "summary": "Mental health refers to emotional, behavioral, and cognitive well-being. It shapes how people handle stress, interact socially, and make choices. Good mental health is not just the absence of illness, but the ability to cope, grow, and sustain happiness. Stress, depression, and anxiety can negatively affect mental health, but therapy, medication, and lifestyle steps can support long-term well-being."
 }
+]
 
-}
