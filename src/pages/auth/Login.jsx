@@ -3,7 +3,6 @@ import { Eye, EyeOff, Heart, ArrowLeft } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
@@ -44,13 +43,13 @@ const Login = () => {
 
       console.log('📤 Sending login request for:', requestPayload.email);
 
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch('http://localhost:5002/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        credentials: 'include', // Include cookies for session
+        credentials: 'include',
         body: JSON.stringify(requestPayload),
       });
 
@@ -62,15 +61,24 @@ const Login = () => {
         hasUser: !!data.user,
         hasToken: !!data.token 
       });
-      
-      if (response.ok && data.user && data.token) {
+
+      if (response.ok && data.success && data.user && data.token) {
         console.log('✅ Login successful for:', data.user.email);
         
-        // Clear form and login
-        setFormData({ email: "", password: "" });
-        setError('');
-        login(data.user, data.token);
-        navigate('/');
+        // Use the login function from context
+        const loginResult = login(data.user, data.token);
+        
+        if (loginResult.success) {
+          // Clear form
+          setFormData({ email: "", password: "" });
+          setError('');
+          
+          // Navigate to homepage
+          console.log('🏠 Redirecting to homepage...');
+          navigate('/', { replace: true });
+        } else {
+          setError('Failed to save login data. Please try again.');
+        }
         
       } else {
         console.log('❌ Login failed:', data.message);
@@ -183,7 +191,9 @@ const Login = () => {
                 <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
                   <p className="text-destructive text-sm">{error}</p>
                 </div>
-              )}            {/* Email & Password Form */}
+              )}
+
+            {/* Email & Password Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">

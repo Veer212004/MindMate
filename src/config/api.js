@@ -1,9 +1,5 @@
-// API Configuration for Mental Health Care App
-export const API_BASE = import.meta.env.PROD
-  ? import.meta.env.VITE_PROD_API_BASE_URL || 'http://localhost:5000'
-  : import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
-// API request function
 export const apiRequest = async (endpoint, options = {}) => {
   const token = localStorage.getItem('authToken');
   
@@ -16,8 +12,10 @@ export const apiRequest = async (endpoint, options = {}) => {
     ...options,
   };
 
+  console.log(`Making API request to: ${API_BASE_URL}${endpoint}`);
+
   try {
-    const response = await fetch(`${API_BASE}${endpoint}`, config);
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -32,15 +30,6 @@ export const apiRequest = async (endpoint, options = {}) => {
   }
 };
 
-// Handle authentication errors
-export const handleAuthError = () => {
-  localStorage.removeItem('authToken');
-  if (window.location.pathname !== '/auth/login' && window.location.pathname !== '/auth/register') {
-    window.location.href = '/auth/login';
-  }
-};
-
-// API endpoints
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/api/auth/login',
@@ -50,5 +39,10 @@ export const API_ENDPOINTS = {
   COUNSELORS: {
     GET_ALL: '/api/counselors',
     GET_BY_ID: (id) => `/api/counselors/${id}`
+  },
+  PEER_SUPPORT: {
+    GET_ROOMS: '/api/peer-support/rooms',
+    CREATE_ROOM: '/api/peer-support/rooms',
+    JOIN_ROOM: (id) => `/api/peer-support/rooms/${id}/join`
   }
 };

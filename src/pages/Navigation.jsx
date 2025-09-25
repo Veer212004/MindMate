@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Button } from "../components/ui/button"
 import { useAuth } from "../context/AuthContext"
-import { User, LogOut, Settings, Menu, X } from "lucide-react"
+import { User, LogOut, Settings, Menu, X, Shield } from "lucide-react"
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
@@ -15,6 +15,22 @@ export function Navigation() {
     navigate('/')
     setShowUserMenu(false)
   }
+
+  const navItems = [
+    { name: 'Self Assessment', href: '/self-assessment' },
+    { name: 'Peer Support', href: '/peer-support' },
+    { name: 'AI Support', href: '/chat' },
+    { name: 'Book Session', href: '/booking' },
+    { name: 'Resources', href: '/resources' },
+    { name: 'Community', href: '/forum' },
+    {
+      name: 'Admin',
+      href: '/admin',
+      icon: Shield,
+      requiresAuth: true,
+      adminOnly: true
+    }
+  ]
 
   return (
     <nav className="bg-background/95 backdrop-blur-sm border-b border-border sticky top-0 z-50">
@@ -30,18 +46,20 @@ export function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/chat" className="text-muted-foreground hover:text-primary calm-transition">
-              AI Support
-            </Link>
-            <Link to="/booking" className="text-muted-foreground hover:text-primary calm-transition">
-              Book Session
-            </Link>
-            <Link to="/resources" className="text-muted-foreground hover:text-primary calm-transition">
-              Resources
-            </Link>
-            <Link to="/forum" className="text-muted-foreground hover:text-primary calm-transition">
-              Community
-            </Link>
+            {navItems.map((item) => {
+              // Skip admin-only items for non-admin users
+              if (item.adminOnly && user?.role !== 'admin') return null;
+              
+              return (
+                <Link 
+                  key={item.name}
+                  to={item.href} 
+                  className="text-muted-foreground hover:text-primary calm-transition"
+                >
+                  {item.name}
+                </Link>
+              )
+            })}
             
             {/* Authentication Section */}
             {isAuthenticated ? (
@@ -117,34 +135,21 @@ export function Navigation() {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden py-4 space-y-4">
-            <Link 
-              to="/chat" 
-              className="block text-muted-foreground hover:text-primary calm-transition"
-              onClick={() => setIsOpen(false)}
-            >
-              AI Support
-            </Link>
-            <Link 
-              to="/booking" 
-              className="block text-muted-foreground hover:text-primary calm-transition"
-              onClick={() => setIsOpen(false)}
-            >
-              Book Session
-            </Link>
-            <Link 
-              to="/resources" 
-              className="block text-muted-foreground hover:text-primary calm-transition"
-              onClick={() => setIsOpen(false)}
-            >
-              Resources
-            </Link>
-            <Link 
-              to="/forum" 
-              className="block text-muted-foreground hover:text-primary calm-transition"
-              onClick={() => setIsOpen(false)}
-            >
-              Community
-            </Link>
+            {navItems.map((item) => {
+              // Skip admin-only items for non-admin users
+              if (item.adminOnly && user?.role !== 'admin') return null;
+              
+              return (
+                <Link 
+                  key={item.name}
+                  to={item.href} 
+                  className="block text-muted-foreground hover:text-primary calm-transition"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {item.name}
+                </Link>
+              )
+            })}
             
             {/* Mobile Authentication Section */}
             <div className="pt-4 border-t border-border space-y-4">

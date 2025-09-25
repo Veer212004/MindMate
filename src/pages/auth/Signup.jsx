@@ -12,7 +12,7 @@ const Signup = () => {
   const [userAnswer, setUserAnswer] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { login } = useAuth();
+  const { register } = useAuth(); // Use register instead of login
   const navigate = useNavigate();
 
   // Generate math captcha
@@ -49,7 +49,7 @@ const Signup = () => {
     try {
       console.log('📧 Checking if email exists:', email);
       
-      const response = await fetch('http://localhost:5000/api/auth/check-email', {
+      const response = await fetch('http://localhost:5002/api/auth/check-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -142,13 +142,13 @@ const Signup = () => {
 
       console.log('📤 Sending signup request for:', requestPayload.email);
 
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch('http://localhost:5002/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        credentials: 'include', // Include cookies for session
+        credentials: 'include',
         body: JSON.stringify(requestPayload),
       });
 
@@ -161,17 +161,25 @@ const Signup = () => {
         hasToken: !!data.token 
       });
       
-      if (response.ok && data.user) {
+      if (response.ok && data.success && data.user && data.token) {
         console.log('✅ Signup successful for:', data.user.email);
         
-        // Clear form
-        setFormData({ name: "", email: "", password: "" });
-        setUserAnswer("");
-        setError('');
+        // Use the register function from context
+        const registerResult = register(data.user, data.token);
         
-        // Login and redirect
-        login(data.user, data.token);
-        navigate('/');
+        if (registerResult.success) {
+          // Clear form
+          setFormData({ name: "", email: "", password: "" });
+          setUserAnswer("");
+          setError('');
+          
+          // Navigate to homepage
+          console.log('🏠 Redirecting to homepage...');
+          navigate('/', { replace: true });
+        } else {
+          setError('Failed to save registration data. Please try again.');
+        }
+        
       } else {
         console.log('❌ Signup failed:', data.message);
         

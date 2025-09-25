@@ -1,212 +1,296 @@
-import { useState } from "react"
-import { Button } from "../components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
-import { BookingCalendar } from "../components/ui/booking-calendar"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select"
-import { Input } from "../components/ui/input"
-import { Label } from "../components/ui/label"
-import { Textarea } from "../components/ui/textarea"
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import BookingCalendar from '../components/ui/booking-calendar';
+import { Card, CardContent } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { User, Calendar, Clock, CheckCircle, AlertCircle, Phone, Video, MapPin } from 'lucide-react';
+import { Badge } from '../components/ui/badge';
+import { ScrollArea } from '../components/ui/scroll-area';
 
-export function BookingPage() {
-  const [selectedDate, setSelectedDate] = useState(null)
-  const [selectedTime, setSelectedTime] = useState('')
-  const [selectedTherapist, setSelectedTherapist] = useState('')
-  const [sessionType, setSessionType] = useState('')
+const BookingPage = () => {
+  const { user } = useAuth();
+  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
+  const [pastAppointments, setPastAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const therapists = [
-    { id: '1', name: 'Dr. Sarah Johnson', specialty: 'Anxiety & Depression', rating: 4.9 },
-    { id: '2', name: 'Dr. Michael Chen', specialty: 'Trauma & PTSD', rating: 4.8 },
-    { id: '3', name: 'Dr. Emily Rodriguez', specialty: 'Relationship Counseling', rating: 4.9 },
-    { id: '4', name: 'Dr. David Kim', specialty: 'Addiction Recovery', rating: 4.7 },
-  ]
+  useEffect(() => {
+    if (user) {
+      loadUserBookings();
+    }
+  }, [user]);
 
-  const timeSlots = [
-    '9:00 AM', '10:00 AM', '11:00 AM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM'
-  ]
+  // Load bookings from localStorage
+  const loadUserBookings = () => {
+    try {
+      setLoading(true);
+      const bookings = JSON.parse(localStorage.getItem('userBookings') || '[]');
+      
+      const now = new Date();
+      const upcoming = bookings.filter(booking => {
+        const bookingDateTime = new Date(`${booking.date} ${booking.time}`);
+        return bookingDateTime > now && ['confirmed', 'scheduled'].includes(booking.status);
+      });
+      
+      const past = bookings.filter(booking => {
+        const bookingDateTime = new Date(`${booking.date} ${booking.time}`);
+        return bookingDateTime <= now || ['completed', 'cancelled'].includes(booking.status);
+      });
+      
+      setUpcomingAppointments(upcoming);
+      setPastAppointments(past);
+    } catch (error) {
+      console.error('Error loading bookings:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const sessionTypes = [
-    { value: 'initial', label: 'Initial Consultation (60 min)', price: '$120' },
-    { value: 'follow-up', label: 'Follow-up Session (50 min)', price: '$100' },
-    { value: 'group', label: 'Group Therapy (90 min)', price: '$60' },
-    { value: 'couples', label: 'Couples Therapy (60 min)', price: '$150' },
-  ]
+  const handleCancelAppointment = (bookingId) => {
+    if (!confirm('Are you sure you want to cancel this appointment?')) return;
+    
+    try {
+      const bookings = JSON.parse(localStorage.getItem('userBookings') || '[]');
+      const updatedBookings = bookings.map(booking => 
+        booking.id === bookingId 
+          ? { ...booking, status: 'cancelled' }
+          : booking
+      );
+      
+      localStorage.setItem('userBookings', JSON.stringify(updatedBookings));
+      alert('Appointment cancelled successfully');
+      loadUserBookings();
+    } catch (error) {
+      console.error('Error cancelling appointment:', error);
+      alert('Failed to cancel appointment. Please try again.');
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'scheduled':
+      case 'confirmed':
+        return <Clock className="h-4 w-4 text-blue-600" />;
+      case 'completed':
+        return <CheckCircle className="h-4 w-4 text-green-600" />;
+      case 'cancelled':
+        return <AlertCircle className="h-4 w-4 text-red-600" />;
+      default:
+        return <Clock className="h-4 w-4 text-gray-600" />;
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'scheduled':
+        return 'bg-blue-100 text-blue-800';
+      case 'confirmed':
+        return 'bg-green-100 text-green-800';
+      case 'completed':
+        return 'bg-gray-100 text-gray-800';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  if (!user) {
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <Card className="p-6">
+          <CardContent className="text-center">
+            <User className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+            <h2 className="text-xl font-semibold mb-2">Please Sign In</h2>
+            <p className="text-gray-600">You need to be signed in to book appointments</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 pt-20 pb-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Book a Session</h1>
-          <p className="text-muted-foreground">
-            Schedule an appointment with one of our licensed mental health professionals
-          </p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Quick Stats */}
+      {(upcomingAppointments.length > 0 || pastAppointments.length > 0) && (
+        <div className="bg-white border-b">
+          <div className="max-w-6xl mx-auto p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-blue-600">{upcomingAppointments.length}</div>
+                  <div className="text-sm text-gray-600">Upcoming Sessions</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-green-600">
+                    {pastAppointments.filter(apt => apt.status === 'completed').length}
+                  </div>
+                  <div className="text-sm text-gray-600">Completed Sessions</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-purple-600">
+                    {upcomingAppointments.length + pastAppointments.length}
+                  </div>
+                  <div className="text-sm text-gray-600">Total Sessions</div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
+      )}
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Booking Form */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Session Details</CardTitle>
-                <CardDescription>Choose your preferred session type and therapist</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="session-type">Session Type</Label>
-                  <Select value={sessionType} onValueChange={setSessionType}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select session type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {sessionTypes.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          <div className="flex justify-between items-center w-full">
-                            <span>{type.label}</span>
-                            <span className="text-primary font-semibold ml-4">{type.price}</span>
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto p-6">
+        {/* Upcoming Appointments */}
+        {upcomingAppointments.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Upcoming Appointments</h2>
+            <div className="grid gap-4">
+              {upcomingAppointments.map((appointment) => (
+                <Card key={appointment.id} className="border-l-4 border-l-blue-500">
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          {getStatusIcon(appointment.status)}
+                          <span className="font-semibold">
+                            {new Date(appointment.date).toLocaleDateString()} at {appointment.time}
+                          </span>
+                          <Badge className={getStatusColor(appointment.status)}>
+                            {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                          </Badge>
+                        </div>
+                        
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center space-x-2">
+                            <User className="h-4 w-4 text-gray-600" />
+                            <span>{appointment.counselor?.name}</span>
                           </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                          <div className="flex items-center space-x-2">
+                            {appointment.sessionMode === 'online' ? (
+                              <Video className="h-4 w-4 text-gray-600" />
+                            ) : (
+                              <MapPin className="h-4 w-4 text-gray-600" />
+                            )}
+                            <span className="text-sm text-gray-600">
+                              {appointment.duration} min • {appointment.sessionMode}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="text-sm text-gray-700">
+                          <strong>Reason:</strong> {appointment.reason}
+                        </div>
+                        
+                        {appointment.sessionMode === 'online' && appointment.meetingLink && (
+                          <div className="text-sm">
+                            <strong>Meeting Link:</strong>{' '}
+                            <a 
+                              href={appointment.meetingLink} 
+                              className="text-blue-600 hover:underline"
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                            >
+                              Join Session
+                            </a>
+                          </div>
+                        )}
+                        
+                        {appointment.sessionMode === 'offline' && appointment.location && (
+                          <div className="text-sm">
+                            <strong>Location:</strong> {appointment.location}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex space-x-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleCancelAppointment(appointment.id)}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
-                <div>
-                  <Label htmlFor="therapist">Therapist</Label>
-                  <Select value={selectedTherapist} onValueChange={setSelectedTherapist}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a therapist" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {therapists.map((therapist) => (
-                        <SelectItem key={therapist.id} value={therapist.id}>
-                          <div>
-                            <div className="font-medium">{therapist.name}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {therapist.specialty} • ⭐ {therapist.rating}
+        {/* Booking Calendar */}
+        <BookingCalendar 
+          user={user} 
+          onBookingComplete={(bookingData) => {
+            console.log('Booking completed:', bookingData);
+            loadUserBookings();
+          }} 
+        />
+
+        {/* Past Appointments */}
+        {pastAppointments.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Past Appointments</h2>
+            <Card>
+              <CardContent className="p-0">
+                <ScrollArea className="h-[400px]">
+                  <div className="p-6 space-y-4">
+                    {pastAppointments.slice(0, 10).map((appointment) => (
+                      <div key={appointment.id} className="border-b pb-4 last:border-b-0">
+                        <div className="flex justify-between items-start">
+                          <div className="space-y-1">
+                            <div className="flex items-center space-x-2">
+                              {getStatusIcon(appointment.status)}
+                              <span className="font-medium">
+                                {new Date(appointment.date).toLocaleDateString()} at {appointment.time}
+                              </span>
+                              <Badge className={getStatusColor(appointment.status)} variant="secondary">
+                                {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                              </Badge>
+                            </div>
+                            
+                            <div className="text-sm text-gray-600">
+                              {appointment.counselor?.name} • {appointment.duration} minutes
+                            </div>
+                            
+                            <div className="text-sm text-gray-700">
+                              <strong>Reason:</strong> {appointment.reason}
                             </div>
                           </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Contact Information</CardTitle>
-                <CardDescription>We'll use this to confirm your appointment</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="first-name">First Name</Label>
-                    <Input id="first-name" placeholder="John" />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div>
-                    <Label htmlFor="last-name">Last Name</Label>
-                    <Input id="last-name" placeholder="Doe" />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="john@example.com" />
-                </div>
-                <div>
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input id="phone" type="tel" placeholder="(555) 123-4567" />
-                </div>
-                <div>
-                  <Label htmlFor="notes">Additional Notes (Optional)</Label>
-                  <Textarea 
-                    id="notes" 
-                    placeholder="Let us know if you have any specific concerns or preferences..."
-                    rows={3}
-                  />
-                </div>
+                </ScrollArea>
               </CardContent>
             </Card>
           </div>
+        )}
+      </div>
 
-          {/* Calendar and Time Selection */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Select Date & Time</CardTitle>
-                <CardDescription>Choose your preferred appointment slot</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <BookingCalendar
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
-                  />
-                  
-                  {selectedDate && (
-                    <div>
-                      <Label>Available Times</Label>
-                      <div className="grid grid-cols-3 gap-2 mt-2">
-                        {timeSlots.map((time) => (
-                          <Button
-                            key={time}
-                            variant={selectedTime === time ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setSelectedTime(time)}
-                            className="text-sm"
-                          >
-                            {time}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Booking Summary */}
-            {selectedDate && selectedTime && sessionType && (
-              <Card className="border-primary/20 bg-primary/5">
-                <CardHeader>
-                  <CardTitle>Booking Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Date:</span>
-                    <span className="font-medium">{selectedDate.toDateString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Time:</span>
-                    <span className="font-medium">{selectedTime}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Session:</span>
-                    <span className="font-medium">
-                      {sessionTypes.find(s => s.value === sessionType)?.label}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Therapist:</span>
-                    <span className="font-medium">
-                      {therapists.find(t => t.id === selectedTherapist)?.name}
-                    </span>
-                  </div>
-                  <hr className="my-2" />
-                  <div className="flex justify-between font-semibold text-lg">
-                    <span>Total:</span>
-                    <span className="text-primary">
-                      {sessionTypes.find(s => s.value === sessionType)?.price}
-                    </span>
-                  </div>
-                  <Button className="w-full mt-4" size="lg">
-                    Confirm Booking
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
+      {/* Emergency Contact */}
+      <div className="bg-red-50 border-t border-red-200 mt-12">
+        <div className="max-w-6xl mx-auto p-6">
+          <div className="flex items-center space-x-4">
+            <Phone className="h-6 w-6 text-red-600" />
+            <div>
+              <h3 className="font-semibold text-red-800">Crisis Support</h3>
+              <p className="text-red-700 text-sm">
+                If you're experiencing a mental health emergency, call the crisis hotline: 
+                <strong className="ml-1">+1-800-CRISIS (24/7)</strong>
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
+
+export default BookingPage;

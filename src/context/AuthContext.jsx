@@ -15,9 +15,8 @@ export const useAuth = () => {
 // Auth Provider Component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authToken, setAuthToken] = useState(localStorage.getItem('authToken'));
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(null);
 
   // Check for existing session on app load
   useEffect(() => {
@@ -28,9 +27,8 @@ export const AuthProvider = ({ children }) => {
 
         if (storedToken && storedUser) {
           const userData = JSON.parse(storedUser);
-          setToken(storedToken);
+          setAuthToken(storedToken);
           setUser(userData);
-          setIsAuthenticated(true);
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
@@ -45,63 +43,54 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
-  // Login function
-  const login = async (userData, authToken) => {
+  // Simple login function that doesn't make additional API calls
+  const login = (userData, token) => {
     try {
-      console.log('🔐 AuthContext: Logging in user', { email: userData?.email });
-      
-      setUser(userData);
-      setToken(authToken);
-      setIsAuthenticated(true);
-      
-      // Persist to localStorage
-      localStorage.setItem('authToken', authToken);
+      localStorage.setItem('authToken', token);
       localStorage.setItem('userData', JSON.stringify(userData));
-      
-      console.log('✅ AuthContext: User logged in successfully');
+      setAuthToken(token);
+      setUser(userData);
+      return { success: true, user: userData };
     } catch (error) {
-      console.error('❌ AuthContext: Login error', error);
-      throw error;
+      console.error('Login storage error:', error);
+      return { success: false, message: error.message };
+    }
+  };
+
+  // Register function - similar to login, just store the data
+  const register = (userData, token) => {
+    try {
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('userData', JSON.stringify(userData));
+      setAuthToken(token);
+      setUser(userData);
+      return { success: true, user: userData };
+    } catch (error) {
+      console.error('Register storage error:', error);
+      return { success: false, message: error.message };
     }
   };
 
   // Logout function
   const logout = () => {
-    console.log('🚪 AuthContext: Logging out user');
-    
-    setUser(null);
-    setToken(null);
-    setIsAuthenticated(false);
-    
-    // Clear from localStorage
     localStorage.removeItem('authToken');
     localStorage.removeItem('userData');
-    
-    console.log('✅ AuthContext: User logged out successfully');
+    setAuthToken(null);
+    setUser(null);
   };
 
-  // Update user data
-  const updateUser = (updatedUserData) => {
-    setUser(updatedUserData);
-    localStorage.setItem('userData', JSON.stringify(updatedUserData));
-  };
-
-  // Check if user has specific permission (for mental health features)
-  const hasPermission = (permission) => {
-    if (!user) return false;
-    return user.permissions?.includes(permission) || user.role === 'admin';
-  };
+  // Computed property for authentication status
+  const isAuthenticated = Boolean(authToken && user);
 
   // Auth context value
   const value = {
     user,
-    isAuthenticated,
+    authToken,
     loading,
-    token,
+    isAuthenticated,
     login,
-    logout,
-    updateUser,
-    hasPermission,
+    register,
+    logout
   };
 
   return (

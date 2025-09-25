@@ -5,6 +5,88 @@ import { Badge } from "../components/ui/badge"
 import { Input } from "../components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select"
 import { useState } from "react"
+import { Link, useLocation } from "react-router-dom"
+import { Video, FileText, Headphones, Users, Phone, ArrowRight, BookOpen, Filter, FileText as BlogIcon } from "lucide-react"
+import { cn } from "../lib/utils"
+
+// Resources Navigation Component
+function ResourcesNav() {
+  const location = useLocation();
+
+  const navItems = [
+    {
+      href: '/resources',
+      label: 'All Resources',
+      icon: BookOpen,
+      description: 'Browse all available resources'
+    },
+    {
+      href: '/resources/videos',
+      label: 'Video Resources',
+      icon: Video,
+      description: 'Curated video content'
+    },
+    {
+      href: '/resources/articles',
+      label: 'Articles & Guides',
+      icon: FileText,
+      description: 'In-depth articles and guides'
+    },
+    {
+      href: '/resources/blog',
+      label: 'Blog Posts',
+      icon: FileText,
+      description: 'Mental health insights and experiences'
+    },
+    {
+      href: '/resources/audio',
+      label: 'Audio Resources',
+      icon: Headphones,
+      description: 'Meditation and audio guides'
+    },
+    {
+      href: '/forum',
+      label: 'Support Groups',
+      icon: Users,
+      description: 'Find community support'
+    },
+    {
+      href: '/resources/crisis',
+      label: 'Crisis Support',
+      icon: Phone,
+      description: 'Immediate help resources'
+    }
+  ];
+
+  return (
+    <div className="bg-card border-b border-border">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav className="flex space-x-8 overflow-x-auto scrollbar-hide py-4">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.href;
+            
+            return (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={cn(
+                  "flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap",
+                  isActive
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                )}
+              >
+                <Icon className="w-4 h-4" />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+    </div>
+  );
+}
 
 export function ResourcesPage() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -118,14 +200,84 @@ export function ResourcesPage() {
     }
   }
 
+  const quickAccessCards = [
+    {
+      title: "Video Resources",
+      description: "Curated video content for mental health support",
+      icon: Video,
+      href: "/resources/videos",
+      color: "from-blue-500 to-blue-600",
+      count: "50+ videos"
+    },
+    {
+      title: "Blog Posts", // Add this new card
+      description: "Student mental health insights and experiences",
+      icon: BlogIcon,
+      href: "/resources/blog",
+      color: "from-purple-500 to-purple-600",
+      count: "Latest posts"
+    },
+    {
+      title: "Audio Resources",
+      description: "Meditation and guided audio sessions",
+      icon: Headphones,
+      href: "/resources/audio",
+      color: "from-purple-500 to-purple-600",
+      count: "30+ sessions"
+    },
+    {
+      title: "Support Groups",
+      description: "Connect with community support",
+      icon: Users,
+      href: "/forum",
+      color: "from-pink-500 to-pink-600",
+      count: "Active groups"
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 pt-20 pb-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Mental Health Resources</h1>
-          <p className="text-muted-foreground">
-            Curated articles, videos, and tools to support your mental health journey
+    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20">
+      {/* Navigation */}
+      <div className="pt-16">
+        <ResourcesNav />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-foreground mb-4">Mental Health Resources</h1>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Comprehensive collection of curated resources to support your mental health and wellbeing journey
           </p>
+        </div>
+
+        {/* Quick Access Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {quickAccessCards.map((card) => {
+            const Icon = card.icon;
+            return (
+              <Link to={card.href} key={card.href}>
+                <Card className="group hover:shadow-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer h-full">
+                  <CardHeader className="pb-3">
+                    <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-r ${card.color} mb-4`}>
+                      <Icon className="w-6 h-6 text-white" />
+                    </div>
+                    <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                      {card.title}
+                    </CardTitle>
+                    <CardDescription>
+                      {card.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between">
+                      <Badge variant="secondary">{card.count}</Badge>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            );
+          })}
         </div>
 
         {/* Search and Filter */}
@@ -138,9 +290,10 @@ export function ResourcesPage() {
               className="w-full"
             />
           </div>
-          <div className="sm:w-64">
+          <div className="sm:w-64 relative">
+            <Filter className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground z-10" />
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger>
+              <SelectTrigger className="pl-9">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -180,7 +333,7 @@ export function ResourcesPage() {
         {/* Resources Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredResources.map((resource) => (
-            <Card key={resource.id} className="group hover:shadow-lg calm-transition">
+            <Card key={resource.id} className="group hover:shadow-lg transition-all duration-300">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -195,7 +348,7 @@ export function ResourcesPage() {
                     {resource.duration || resource.readTime}
                   </span>
                 </div>
-                <CardTitle className="text-lg group-hover:text-primary calm-transition">
+                <CardTitle className="text-lg group-hover:text-primary transition-colors">
                   {resource.title}
                 </CardTitle>
               </CardHeader>
@@ -212,7 +365,7 @@ export function ResourcesPage() {
                   ))}
                 </div>
 
-                <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground calm-transition">
+                <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-200">
                   {resource.type === 'video' ? 'Watch' : resource.type === 'audio' ? 'Listen' : 'Read'}
                 </Button>
               </CardContent>
@@ -248,6 +401,12 @@ export function ResourcesPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button>Book a Session</Button>
               <Button variant="outline">Chat with AI Support</Button>
+            </div>
+            <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700">
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                <strong>Crisis Support:</strong> If you're in immediate danger or having thoughts of self-harm, 
+                please call 988 (Crisis Lifeline) or go to your nearest emergency room.
+              </p>
             </div>
           </CardContent>
         </Card>

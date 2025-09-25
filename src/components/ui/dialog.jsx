@@ -51,8 +51,6 @@ function DialogContent({
   children,
   showCloseButton = true,
   ...props
-} & {
-  
 }) {
   return (
     <DialogPortal data-slot="dialog-portal">
